@@ -15,8 +15,21 @@ class Election:
 	self.leader_path = None
     
 		 
+    def kill_myself(self,signum, frame):
+	self.zk.delete(self.path)
+	if(self.is_leader) :
+		self.zk.delete(self.leader_path)
+	kill_now = True	
+		 
     def is_leading(self):
-		#TO COMPLETE
+	return self.is_leader	
+		
+
+    def on_node_delete(self, event) :
+	#in case of deletion start elections(perform a vote)
+	if event.type == kazoo.protocol.states.EventType.DELETED:
+		print 'Master died'
+		self.ballot(self.zk.get_children(self.election_path))
 		
 	#perform a vote..	
     def ballot(self,children):
@@ -35,6 +48,19 @@ class Election:
 		self.is_leader = False
 		return False
 
+def leader_func():
+	print("I am the leader now")
+
+def my_listener(state):
+    if state == KazooState.LOST:
+        # Register somewhere that the session was lost
+        logging.info('Session lost')
+    elif state == KazooState.SUSPENDED:
+        # Handle being disconnected from Zookeeper
+        logging.info('Disconnected')        
+    else:
+        # Handle being connected/reconnected to Zookeeper
+        logging.info('Connected')
                     
 if __name__ == '__main__':
     zkhost = "127.0.0.1:2181" #default ZK host
@@ -42,9 +68,17 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         zkhost=sys.argv[2]
         print("Using ZK at %s"%(zkhost))
+    zk = KazooClient(zkhost) 
+    zk.add_listener(my_listener)
+    zk.start()
    
-	#TO COMPLETE
-    #ADD misisng initialization... 
-   
-    while True:
+    master_path = MASTER_PATH + "guid_"
+    child = zk.create(master_path, ephemeral=True, sequence=True)
+    election = Election(zk, MASTER_PATH, child)
+
+    if election.ballot(zk.get_children(MASTER_PATH)) == False :
+	print("I'm a worker")
+
+    while (kill_now == False) :
         time.sleep(1)
+    print("I was killed gracefully")
