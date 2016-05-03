@@ -9,7 +9,7 @@ from utils import WORKERS_PATH
 class Client:
 
     def __init__(self,zk):
-        self.zk = zk
+        self.zk = zk	
 
     def compute_task(self):
 	task_id = random.randint(100, 99999)
@@ -24,18 +24,29 @@ class Client:
 	zk.set(data_path, data_value)
 	print("New task with id  = %s and data = %s" %(task_data, data_value))
 	return task_path
-	
+
     def submit_task(self):
         new_task_path = self.compute_task()
 	watcher = zk.DataWatch(new_task_path, self.task_completed)
-		
-	#REACT to changes on the submitted task..				   
-    def task_completed(self,data,stat):
-  	  	#TO COMPLETE
+  		
+    #REACT to changes on the submitted task..				   
+    def task_completed(self, data, stat):
+	if data and ("," in data) : 
+		data_stats =  data.split(",")
+		print("Task %s Stats %s" %(data_stats[0], data_stats[1]))
+        elif data and ("=" in data):
+		data_res = data.split("=", 2)
+		task_path = TASKS_PATH + data_res[0]
+		data_path = DATA_PATH + data_res[0]
+		result = data_res[1]
+		print("Task %s executed with result: %s" %(data_res[0], result))
+		zk.delete(task_path)
+		zk.delete(data_path) 
 	
     def submit_task_loop(self):
         while True:
             self.submit_task()
+	    time.sleep(30)
 
 if __name__ == '__main__':
     zk = utils.init()    
