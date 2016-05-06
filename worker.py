@@ -8,7 +8,7 @@ from utils import WORKERS_PATH
 
 class Worker:
 
-   def __init__(self,zk):
+    def __init__(self,zk):
         self.zk = zk
         #1.choose a random id
 	self.uuid = uuid.uuid4()
@@ -18,9 +18,9 @@ class Worker:
 	zk.set(self.worker_id, "non")
 	print("Worker %s  created!" %(self.worker_id))
 	#3.watch znode
-	zk.DataWatch(self.path, self.assignment_change)   		 
-
-     # do something upon the change on assignment
+	zk.DataWatch(self.path, self.assignment_change)   
+    
+    # do something upon the change on assignment
     def assignment_change(self, atask, stat):
 	if atask and not atask == "non" :
 		#4.5. get task id uppon assignment in workers, get task data in data/yyy
@@ -31,6 +31,14 @@ class Worker:
 			result = utils.task(data)
 			task_path = TASKS_PATH + atask
 			task_val = atask + "=" + str(result)
+			# set result in task - task completion
+			if self.zk.exists(task_path) :
+				zk.set(task_path, task_val)
+				print("Worker completed task %s with result %s" %(atask, result))
+			else :
+				print("Task %s not found, maybe the connection  was lost" %(task_path))
+			#7. delete assignment
+			zk.set(self.path, "non")
 
 if __name__ == '__main__':
     zk = utils.init()    
