@@ -11,12 +11,18 @@ class Master:
     def __init__(self,zk):
         self.master = False
         self.zk = zk
-        ##complete initialization...
-		
-    
-	#assign tasks 				   
-    def assign(self,children):
- 	   #todo....
+	my_path = zk.create(MASTER_PATH, ephemeral=True, sequence=True)
+	self.election = Election(zk, MASTER_PATH, my_path)
+	self.election.ballot(self.zk.get_children(MASTER_PATH))
+	zk.ChildrenWatch(WORKERS_PATH,self.assign, send_event=True)
+	zk.ChildrenWatch(TASKS_PATH, self.assign, send_event=True)
+					   
+    #assign tasks 				   
+    def assign(self, children, event):
+        if self.election.is_leading():
+            if(event) :
+       	        print("Change happened with event  = %s" %(event.type))
+	    tasks = self.zk.get_children(TASKS_PATH)
                 
 if __name__ == '__main__':
     zk = utils.init()
