@@ -16,6 +16,20 @@ class Master:
 	self.election.ballot(self.zk.get_children(MASTER_PATH))
 	zk.ChildrenWatch(WORKERS_PATH,self.assign, send_event=True)
 	zk.ChildrenWatch(TASKS_PATH, self.assign, send_event=True)
+
+     def compute_free_worker(self):
+	workers = self.zk.get_children(WORKERS_PATH)
+	found_worker = False
+	if not workers == None : 
+		for i in range(0,len(workers)) :
+			worker_path = WORKERS_PATH + workers[i]
+			val = self.zk.get(worker_path)
+			# Check if no task is assigned to the worker
+			print ("Found worker with data %s" %(str(val))) 
+			if ("non" in val) :
+				found_worker = True
+				return  workers[i]
+        return None
 					   
     #assign tasks 				   
     def assign(self, children, event):
