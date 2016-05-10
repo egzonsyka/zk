@@ -14,7 +14,7 @@ Below you can find implementation
 
 The first thing we did after instatiating VM template was to make sure that Zookeper
 service was up and running, and it was as you can see in the following screenshot
-![Screenshot 1](screenshots/zookeper_service.png)
+![Screenshot 1](screenshots/zookeeper_service.png)
 
 ### 1.2 ZK-Shell 
 
@@ -31,7 +31,7 @@ Paths:
 The Kazoo's [API documentation](http://kazoo.readthedocs.io/en/latest/basic_usage.html) basic usage was very helpful and I think that's the only thing 
 that was required to use(with some additions).
 Also we tried some Kazoo basic functions and also the *kazoo_example.py*.
-![Screenshot 3](screenshots/kazoo-example.png)
+![Screenshot 3](screenshots/kazoo_example.png)
  
 ### 2 Leader Election
 
