@@ -26,7 +26,6 @@ class Master:
 			worker_path = WORKERS_PATH + workers[i]
 			val = self.zk.get(worker_path)
 			# Check if no task is assigned to the worker
-			print ("Found worker with data %s" %(str(val))) 
 			if ("non" in val) :
 				found_worker = True
 				return  workers[i]
@@ -42,14 +41,14 @@ class Master:
                 task_path = TASKS_PATH + tasks[i]
 	        task_data = self.zk.get(task_path)
 	        if("," not in task_data) : # not assigned
-		    worker = self.compute_free_worker()
-		    if not worker == None :
-                        worker_path = WORKERS_PATH + worker
-		        print("Assigned worker = %s to task = %s" %(worker, tasks[i]))
+		    free_worker = self.compute_free_worker()
+		    if not free_worker == None :
+                        worker_path = WORKERS_PATH + free_worker
+		        print("Assigned worker = %s to task = %s" %(free_worker, tasks[i]))
 		        new_task_data = []
 		        new_task_data.append(task_data)
 		        new_task_data.append(",")
-		        new_task_data.append(worker)
+		        new_task_data.append(free_worker)
 		        self.zk.set(task_path, str(new_task_data))
 		        self.zk.set(worker_path, str(tasks[i]))
 		        self.zk.get(worker_path, self.finished_task)
