@@ -74,22 +74,22 @@ zk.ChildrenWatch(TASKS_PATH, self.assign, send_event=True)
 
 - We have completed the code in *client.py* in order to make the client able to submit tasks. 
 - We have completed the code in *worker.py* in order to amke the worker able to retrieve a task and execute it by calling *utils.py*.
-- We finally were able to complete the *master.py*. Here we bind workeres with tasks. *Master* class is responsible to assign tasks to the workers, then the workers process their tasks.
+- We finally were able to complete the *master.py*. Here we bind workers with tasks. *Master* class is responsible to assign tasks to the workers, then the workers process their tasks.
 
 #### 3.2 Fault-Tolerance
 
 In the following section we will provide the logs of our scenarios:
 
-1.**(1C/1W/1M) a worker or a client fails;**
+1. **(1C/1W/1M) a worker or a client fails;**
 Client fails and is detected by the worker
 ![Screenshot 6](screenshots/client_failure.png)
 
-2.**(1C/2W/1M) a worker fails;**
+2. **(1C/2W/1M) a worker fails;**
 When a worker fails, the other one continues with the tasks.
 ![Screenshot 7](screenshots/worker-failure.png)
 ![Screenshot 8](screenshots/worker-failure-2.png)
 
-3.**(2C/2W/1M) workers compete in executing the tasks submitted by the clients;**
+3. **(2C/2W/1M) workers compete in executing the tasks submitted by the clients;**
 We can clearly see how **workers** compete for different tasks and execute them in different orders.
 ![Screenshot 9](screenshots/workers_competing_for_tasks.png)
 
