@@ -14,7 +14,7 @@ Below you can find implementation
 
 The first thing we did after instatiating VM template was to make sure that Zookeper
 service was up and running, and it was as you can see in the following screenshot
-![Screenshot 1](screenshots/zookeeper_service.png)
+![Screenshot 1](screenshots/zookeper_service.png)
 
 ### 1.2 ZK-Shell 
 
@@ -59,15 +59,19 @@ Here we implemented the master/worker architecture.
 
 - We followed the requirements closely, setting watchers to the **/tasks** and **/workers**, we participate in election by calling 
   the election's ballot function:
-  ```python   
-        self.election = Election(zk, MASTER_PATH, my_path)
-        self.election.ballot(self.zk.get_children(MASTER_PATH))
-  ```
+
+```python   
+self.election = Election(zk, MASTER_PATH, my_path)
+self.election.ballot(self.zk.get_children(MASTER_PATH))
+```
+  
   When something changes on **/tasks** and **/workers** the function that we call is _assign_ (we defined it when we set the watchers):
-  ```python   
-        zk.ChildrenWatch(WORKERS_PATH,self.assign, send_event=True)	
-        zk.ChildrenWatch(TASKS_PATH, self.assign, send_event=True)
-  ```
+  
+```python   
+zk.ChildrenWatch(WORKERS_PATH,self.assign, send_event=True)	
+zk.ChildrenWatch(TASKS_PATH, self.assign, send_event=True)
+```
+
 - We have completed the code in *client.py* in order to make the client able to submit tasks. 
 - We have completed the code in *worker.py* in order to amke the worker able to retrieve a task and execute it by calling *utils.py*.
 - We finally were able to complete the *master.py*. Here we bind workeres with tasks. *Master* class is responsible to assign tasks to the workers, then the workers process their tasks.
